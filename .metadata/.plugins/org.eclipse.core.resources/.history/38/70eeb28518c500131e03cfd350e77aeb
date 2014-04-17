@@ -1,0 +1,86 @@
+package client;
+
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
+public class client
+{
+	public static void main(String[] args) throws IOException
+	{
+		Socket echoSocket = null;
+		ObjectOutputStream out = null;
+		ObjectInputStream in = null;
+		String message = "";
+	
+		
+		// Create socket connection with host address as localhost and port number with 38300
+		try
+		{
+			echoSocket = new Socket("localhost", 38300);
+			out = new ObjectOutputStream(echoSocket.getOutputStream());
+			out.flush();
+			in = new ObjectInputStream(echoSocket.getInputStream());
+	
+			
+			int i = 0;
+			try {
+				message = (String) in.readObject();
+			} catch (ClassNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			while(message != null){
+			//
+				i++;
+				
+				System.out.println("server>" + message+ " : " + i );
+				try {
+					message = (String) in.readObject();
+				} catch (ClassNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			//
+			}
+			//
+			System.out.println("server>" + message+ " = empty? " );
+
+			for( i = 0; i <=25;i++)
+			{
+				//System.out.println("server>" + message+ " : " + i );
+				out.writeObject("i="+i);
+			}
+		}
+		catch (UnknownHostException e)
+		{
+			System.err.println("Don't know about host: LocalHost.");
+			System.exit(1);
+		}
+		catch (IOException e)
+		{
+			System.err.println("Couldn't get I/O for " + "the connection to: LocalHost:");
+			System.exit(1);
+		}
+		finally
+		{
+			// Closing connection
+			try
+			{
+				in.close();
+				out.close();
+				if (echoSocket != null)
+				{
+					echoSocket.close();
+				}
+			}
+			catch (IOException ioException)
+			{
+				ioException.printStackTrace();
+			}
+		}
+	}
+}
